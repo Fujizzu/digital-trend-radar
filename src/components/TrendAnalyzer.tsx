@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, TrendingUp, Users, Calendar, Globe, Loader2, RefreshCw, AlertCircle } from 'lucide-react';
+import { Search, TrendingUp, Users, Calendar, Globe, Loader2, RefreshCw, AlertCircle, Activity, Heart, Zap, Clock } from 'lucide-react';
 import { useTrendData } from '@/hooks/useTrendData';
 import { useTrendSearch } from '@/hooks/useTrendSearch';
 
@@ -36,16 +36,35 @@ const TrendAnalyzer = () => {
 
   const isLoading = isLoadingData || searchMutation.isPending;
 
+  const getSourceIcon = (source: string) => {
+    switch (source) {
+      case 'news': return '📰';
+      case 'reddit': return '🔴';
+      case 'hackernews': return '🟠';
+      default: return '🌐';
+    }
+  };
+
+  const getEmotionIcon = (emotion: string) => {
+    switch (emotion) {
+      case 'joy': return '😊';
+      case 'anger': return '😠';
+      case 'fear': return '😰';
+      case 'surprise': return '😮';
+      default: return '🤔';
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
             <Search className="h-5 w-5 mr-2" />
-            Trend Analysis
+            AI-Powered Trend Analysis
           </CardTitle>
           <CardDescription>
-            Analyze real-time trends across social media, search, and news platforms
+            Real-time intelligence across news, social media, and forums. Advanced sentiment analysis with emotion detection.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -62,7 +81,7 @@ const TrendAnalyzer = () => {
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {searchMutation.isPending ? 'Searching...' : 'Loading...'}
+                  {searchMutation.isPending ? 'Analyzing...' : 'Loading...'}
                 </>
               ) : (
                 <>
@@ -87,11 +106,16 @@ const TrendAnalyzer = () => {
             <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <div className="flex items-center">
                 <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-600" />
-                <span className="text-blue-800 font-medium">Searching the internet for latest trends...</span>
+                <span className="text-blue-800 font-medium">Searching across multiple platforms...</span>
               </div>
               <p className="text-blue-600 text-sm mt-1">
-                Fetching data from news sources, Reddit, and performing sentiment analysis. This may take a moment.
+                Analyzing data from news sources, Reddit, Hacker News with AI-powered sentiment analysis and keyword extraction.
               </p>
+              <div className="flex space-x-4 mt-2 text-xs text-blue-500">
+                <span>📰 News Articles</span>
+                <span>🔴 Reddit Discussions</span>
+                <span>🟠 Hacker News</span>
+              </div>
             </div>
           )}
 
@@ -132,18 +156,27 @@ const TrendAnalyzer = () => {
       <div className="grid gap-4">
         {trendResults && trendResults.length > 0 ? (
           <>
-            <div className="text-sm text-muted-foreground mb-2">
-              Found {trendResults.length} trend{trendResults.length !== 1 ? 's' : ''} for "{activeSearch}"
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-sm text-muted-foreground">
+                Found {trendResults.length} trend{trendResults.length !== 1 ? 's' : ''} for "{activeSearch}"
+              </div>
+              <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                <Activity className="h-3 w-3" />
+                <span>Real-time analysis</span>
+              </div>
             </div>
             {trendResults.map((trend) => (
-              <Card key={trend.id} className="hover:shadow-md transition-shadow">
+              <Card key={trend.id} className="hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
                 <CardContent className="pt-6">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1 mr-4">
-                      <h3 className="text-lg font-semibold mb-2 line-clamp-2">
-                        {trend.content_summary || 'Trend Analysis'}
-                      </h3>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
+                      <div className="flex items-center mb-2">
+                        <span className="text-lg mr-2">{getSourceIcon(trend.source_type)}</span>
+                        <h3 className="text-lg font-semibold line-clamp-2">
+                          {trend.content_summary || 'Trend Analysis'}
+                        </h3>
+                      </div>
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-slate-600 mb-3">
                         <div className="flex items-center">
                           <Users className="h-4 w-4 mr-1" />
                           {trend.mention_count.toLocaleString()} mentions
@@ -161,24 +194,45 @@ const TrendAnalyzer = () => {
                           {new Date(trend.timestamp_original).toLocaleDateString()}
                         </div>
                       </div>
+
+                      {/* Emotion indicators */}
+                      {trend.engagement_metrics?.emotions && trend.engagement_metrics.emotions.length > 0 && (
+                        <div className="flex items-center space-x-2 mb-3">
+                          <Heart className="h-4 w-4 text-pink-500" />
+                          <span className="text-sm text-muted-foreground mr-2">Emotions:</span>
+                          {trend.engagement_metrics.emotions.map((emotion: string, index: number) => (
+                            <span key={index} className="text-sm">
+                              {getEmotionIcon(emotion)} {emotion}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <Badge 
-                      variant={
-                        trend.sentiment === 'positive' 
-                          ? 'default' 
-                          : trend.sentiment === 'negative' 
-                          ? 'destructive' 
-                          : 'secondary'
-                      }
-                      className="shrink-0"
-                    >
-                      {trend.sentiment}
-                    </Badge>
+                    <div className="flex flex-col items-end space-y-2">
+                      <Badge 
+                        variant={
+                          trend.sentiment === 'positive' 
+                            ? 'default' 
+                            : trend.sentiment === 'negative' 
+                            ? 'destructive' 
+                            : 'secondary'
+                        }
+                        className="shrink-0"
+                      >
+                        {trend.sentiment === 'positive' ? '😊' : trend.sentiment === 'negative' ? '😞' : '😐'} {trend.sentiment}
+                      </Badge>
+                      {trend.engagement_metrics?.score && (
+                        <div className="flex items-center text-xs text-muted-foreground">
+                          <Zap className="h-3 w-3 mr-1" />
+                          {trend.engagement_metrics.score} score
+                        </div>
+                      )}
+                    </div>
                   </div>
                   
                   {trend.keywords && trend.keywords.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {trend.keywords.slice(0, 8).map((keyword, keywordIndex) => (
+                      {trend.keywords.slice(0, 10).map((keyword, keywordIndex) => (
                         <Badge key={keywordIndex} variant="outline" className="text-xs">
                           {keyword.keyword}
                           {keyword.relevance_score < 1 && (
@@ -188,9 +242,9 @@ const TrendAnalyzer = () => {
                           )}
                         </Badge>
                       ))}
-                      {trend.keywords.length > 8 && (
+                      {trend.keywords.length > 10 && (
                         <Badge variant="outline" className="text-xs opacity-60">
-                          +{trend.keywords.length - 8} more
+                          +{trend.keywords.length - 10} more
                         </Badge>
                       )}
                     </div>
@@ -198,7 +252,10 @@ const TrendAnalyzer = () => {
 
                   <div className="w-full bg-slate-200 rounded-full h-2">
                     <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                      className={`h-2 rounded-full transition-all duration-500 ${
+                        trend.sentiment === 'positive' ? 'bg-green-500' :
+                        trend.sentiment === 'negative' ? 'bg-red-500' : 'bg-blue-500'
+                      }`}
                       style={{ width: `${trend.confidence_score * 100}%` }}
                     ></div>
                   </div>
@@ -214,7 +271,7 @@ const TrendAnalyzer = () => {
                 No trend data found for "{activeSearch}"
               </p>
               <p className="text-sm text-muted-foreground mb-4">
-                Try searching for a different keyword or click "Analyze" to fetch fresh data from the internet
+                Try searching for a different keyword or click "Analyze" to fetch fresh data from multiple sources
               </p>
               <Button 
                 onClick={handleAnalyze} 
@@ -233,9 +290,23 @@ const TrendAnalyzer = () => {
               <p className="text-muted-foreground mb-2">
                 Enter a keyword above to start analyzing trends
               </p>
-              <p className="text-sm text-muted-foreground">
-                We'll search across news, social media, and other sources to find the latest trends
+              <p className="text-sm text-muted-foreground mb-4">
+                Our AI will search across news, social media, and forums to find the latest trends and insights
               </p>
+              <div className="flex justify-center space-x-4 text-xs text-muted-foreground">
+                <span className="flex items-center">
+                  <Clock className="h-3 w-3 mr-1" />
+                  Real-time data
+                </span>
+                <span className="flex items-center">
+                  <Activity className="h-3 w-3 mr-1" />
+                  AI analysis
+                </span>
+                <span className="flex items-center">
+                  <Heart className="h-3 w-3 mr-1" />
+                  Emotion detection
+                </span>
+              </div>
             </CardContent>
           </Card>
         ) : null}
