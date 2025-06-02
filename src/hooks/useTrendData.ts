@@ -20,6 +20,8 @@ export const useTrendData = (searchKeyword?: string) => {
   return useQuery({
     queryKey: ['trend-data', searchKeyword],
     queryFn: async () => {
+      console.log('Fetching trend data for keyword:', searchKeyword);
+      
       let query = supabase
         .from('trend_data')
         .select(`
@@ -38,7 +40,12 @@ export const useTrendData = (searchKeyword?: string) => {
 
       const { data, error } = await query;
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching trend data:', error);
+        throw error;
+      }
+      
+      console.log('Raw trend data:', data);
       
       // Transform the data to match our interface
       const transformedData = data?.map(item => ({
@@ -55,8 +62,11 @@ export const useTrendData = (searchKeyword?: string) => {
         })) || []
       })) || [];
 
+      console.log('Transformed trend data:', transformedData);
       return transformedData as TrendData[];
     },
     enabled: true,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
   });
 };

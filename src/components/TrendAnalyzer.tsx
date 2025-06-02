@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, TrendingUp, Users, Calendar, Globe, Loader2, RefreshCw } from 'lucide-react';
+import { Search, TrendingUp, Users, Calendar, Globe, Loader2, RefreshCw, AlertCircle } from 'lucide-react';
 import { useTrendData } from '@/hooks/useTrendData';
 import { useTrendSearch } from '@/hooks/useTrendSearch';
 
@@ -18,6 +18,7 @@ const TrendAnalyzer = () => {
   const handleAnalyze = async () => {
     if (!searchQuery.trim()) return;
     
+    console.log('Starting analysis for:', searchQuery);
     setActiveSearch(searchQuery);
     
     // First, try to get existing data
@@ -89,7 +90,19 @@ const TrendAnalyzer = () => {
                 <span className="text-blue-800 font-medium">Searching the internet for latest trends...</span>
               </div>
               <p className="text-blue-600 text-sm mt-1">
-                This may take a moment as we fetch data from news sources, Reddit, and other platforms.
+                Fetching data from news sources, Reddit, and performing sentiment analysis. This may take a moment.
+              </p>
+            </div>
+          )}
+
+          {searchMutation.isError && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-center">
+                <AlertCircle className="h-4 w-4 mr-2 text-red-600" />
+                <span className="text-red-800 font-medium">Search Error</span>
+              </div>
+              <p className="text-red-600 text-sm mt-1">
+                {searchMutation.error?.message || 'Failed to search for trends. Please try again.'}
               </p>
             </div>
           )}
@@ -100,7 +113,9 @@ const TrendAnalyzer = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="text-center text-red-600">
-              <p>Error loading trend data: {error.message}</p>
+              <AlertCircle className="h-8 w-8 mx-auto mb-2" />
+              <p className="font-medium">Error loading trend data</p>
+              <p className="text-sm">{error.message}</p>
               <Button 
                 variant="outline" 
                 onClick={() => refetch()} 
@@ -195,7 +210,7 @@ const TrendAnalyzer = () => {
           <Card>
             <CardContent className="text-center py-8">
               <Search className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground mb-2">
                 No trend data found for "{activeSearch}"
               </p>
               <p className="text-sm text-muted-foreground mb-4">
@@ -215,7 +230,7 @@ const TrendAnalyzer = () => {
           <Card>
             <CardContent className="text-center py-8">
               <Search className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground mb-2">
                 Enter a keyword above to start analyzing trends
               </p>
               <p className="text-sm text-muted-foreground">

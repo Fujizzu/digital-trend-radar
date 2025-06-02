@@ -27,10 +27,11 @@ export const useTrendSearch = () => {
         throw error;
       }
 
+      console.log('Search completed successfully:', data);
       return data;
     },
     onSuccess: (data, keyword) => {
-      console.log('Search completed successfully:', data);
+      console.log('Search mutation successful:', data);
       
       // Invalidate and refetch trend data
       queryClient.invalidateQueries({ queryKey: ['trend-data'] });
