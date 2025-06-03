@@ -23,8 +23,16 @@ export interface TrendData {
   sentiment: 'positive' | 'negative' | 'neutral';
   confidence_score: number;
   mention_count: number;
-  source_type: string;
+  source_type: 'yle' | 'hs' | 'iltalehti' | 'is' | 'mtv' | 'suomi24' | 'vauva' | 'ylilauta' | 'murobbs' | 'facebook' | 'linkedin' | 'twitter' | 'kauppalehti' | 'tekniikka_talous';
   timestamp_original: string;
   engagement_metrics?: EngagementMetrics;
   keywords: TrendKeyword[];
+  language?: 'fi' | 'sv' | 'en';
+  region?: string;
+  city?: string;
+  prediction?: {
+    forecast: number[];
+    confidence: number;
+    timeframe: string;
+  };
 }

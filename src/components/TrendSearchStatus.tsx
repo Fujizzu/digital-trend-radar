@@ -16,15 +16,18 @@ const TrendSearchStatus: React.FC<TrendSearchStatusProps> = ({
       <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <div className="flex items-center">
           <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-600" />
-          <span className="text-blue-800 font-medium">Searching across multiple platforms...</span>
+          <span className="text-blue-800 font-medium">Searching across Finnish platforms...</span>
         </div>
         <p className="text-blue-600 text-sm mt-1">
-          Analyzing data from news sources, Reddit, Hacker News with AI-powered sentiment analysis and keyword extraction.
+          Analyzing data from YLE, Helsingin Sanomat, Iltalehti, Suomi24, and social media with AI-powered Finnish sentiment analysis.
         </p>
-        <div className="flex space-x-4 mt-2 text-xs text-blue-500">
-          <span>📰 News Articles</span>
-          <span>🔴 Reddit Discussions</span>
-          <span>🟠 Hacker News</span>
+        <div className="flex flex-wrap gap-2 mt-2 text-xs text-blue-500">
+          <span>📺 YLE News</span>
+          <span>📰 Helsingin Sanomat</span>
+          <span>📱 Iltalehti</span>
+          <span>💬 Suomi24</span>
+          <span>👶 Vauva.fi</span>
+          <span>📊 Social Media</span>
         </div>
       </div>
     );
